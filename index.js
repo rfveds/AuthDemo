@@ -3,8 +3,6 @@ const app = express();
 const User = require('./models/user');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { redirect } = require('express/lib/response');
-
 
 main().catch(err => console.log(err));
 
@@ -35,6 +33,21 @@ app.post('/register', async (req, res) => {
     })
     await user.save();
     res.redirect('/');
+})
+
+app.get('/login', (req, res) => {
+    res.render('login');
+})
+
+app.post('/login', async (req, res) => {
+    const { password, username } = req.body;
+    const user = await User.findOne({ username });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (validPassword) {
+        res.send('Welcome');
+    } else {
+        res.send('Try Again');
+    }
 })
 
 app.get('/secret', (req, res) => {
